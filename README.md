@@ -109,11 +109,13 @@ assets/mbti-characters/
 ชื่อไฟล์ที่แนะนำคือใช้ MBTI type เป็นตัวพิมพ์ใหญ่ เช่น:
 
 ```text
-INTJ.png
+INTJ.jpg
 ENFP.png
-ISTJ.png
-ESFP.png
+ISTJ.webp
+ESFP.jpg
 ```
+
+Supported result image extensions: `.jpg`, `.png`, `.webp`.
 
 แนะนำให้ใช้ `.png` พื้นหลังโปร่งใส ขนาดต้นฉบับ `512x512` หรือ `1024x1024` แล้วค่อยย่อเป็น asset ตามต้องการ
 

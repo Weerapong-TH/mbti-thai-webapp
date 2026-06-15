@@ -25,6 +25,7 @@ const typePairs = [
 const dimensionOrder = ["EI", "SN", "TF", "JP"];
 const questionsPerDimension = 4;
 const recentQuestionStorageKey = "mbtiThaiQuiz.lastQuestionIds";
+const characterImageExtensions = ["jpg", "png", "webp"];
 let pendingRenderTimer = null;
 
 document.addEventListener("DOMContentLoaded", init);
@@ -461,6 +462,7 @@ function renderResult(animate = false) {
             <div class="grid gap-4">
               ${typePairs.map((pair) => renderScorePair(pair, scores)).join("")}
             </div>
+            ${renderCharacterFigure(type, result)}
           </section>
 
           <section class="grid gap-5">
@@ -472,6 +474,58 @@ function renderResult(animate = false) {
       </div>
     </section>
   `, animate);
+}
+
+function renderCharacterFigure(type, result) {
+  const fallbackId = `character-fallback-${type}`;
+  const altText = `ภาพตัวละคร MBTI ${type} / MBTI ${type} character - ${result.title}`;
+
+  return `
+    <figure class="mt-8 flex justify-center border-t border-stone-200 pt-6">
+      <div class="relative aspect-square w-full max-w-[16rem] overflow-hidden rounded-lg border border-stone-200 bg-gradient-to-br from-indigo-50 via-white to-amber-50 sm:max-w-[18rem]">
+        <div id="${fallbackId}" class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center">
+          <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white text-xl font-bold text-primary shadow-sm">${type}</span>
+          <span class="text-sm font-semibold leading-5 text-textMuted">MBTI character</span>
+        </div>
+        <img
+          class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
+          src="${getCharacterImageSrc(type, 0)}"
+          alt="${escapeHTML(altText)}"
+          loading="lazy"
+          data-extension-index="0"
+          onload="handleCharacterImageLoad(this)"
+          onerror="handleCharacterImageError(this, '${type}')"
+        >
+      </div>
+    </figure>
+  `;
+}
+
+function getCharacterImageSrc(type, extensionIndex) {
+  return `assets/mbti-characters/${type}.${characterImageExtensions[extensionIndex]}`;
+}
+
+function handleCharacterImageLoad(image) {
+  const fallback = image.previousElementSibling;
+
+  image.classList.remove("opacity-0");
+  image.classList.add("opacity-100");
+
+  if (fallback) {
+    fallback.classList.add("hidden");
+  }
+}
+
+function handleCharacterImageError(image, type) {
+  const nextExtensionIndex = Number(image.dataset.extensionIndex || 0) + 1;
+
+  if (nextExtensionIndex < characterImageExtensions.length) {
+    image.dataset.extensionIndex = String(nextExtensionIndex);
+    image.src = getCharacterImageSrc(type, nextExtensionIndex);
+    return;
+  }
+
+  image.remove();
 }
 
 function renderScorePair(pair, scores) {
